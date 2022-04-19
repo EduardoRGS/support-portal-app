@@ -1,11 +1,19 @@
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { UserComponent } from '../model/user/user.component';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthenticationService {
+  private host = environment.apiUrl;
 
-  constructor() { }
+  constructor(private http: HttpClient) { }
+
+  public login(user: UserComponent) : Observable<HttpResponse<any> | HttpErrorResponse> {
+    return this.http.post<HttpResponse<any> | HttpErrorResponse>(`${this.host}/user/login`, user, {observe: 'response'});
+  }
+
 }
