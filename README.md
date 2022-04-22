@@ -2,7 +2,7 @@
 
 > Status: Ainda em Desenvolvimento ⚠️
 
-## Esse é o front-end da api support portal
+## Este é o front-end da api support portal
 
 ## O back-end caso queira conferir está [aqui](https://github.com/EduardoRGS/support-portal)
 
