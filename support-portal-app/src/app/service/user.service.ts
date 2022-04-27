@@ -3,8 +3,6 @@ import { HttpClient, HttpErrorResponse, HttpEvent, HttpResponse } from '@angular
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 import { User } from '../model/user';
-import { JwtHelperService } from "@auth0/angular-jwt";
-import { stringify } from 'querystring';
 import { CustomHttpResponse } from '../model/custom-http-response';
 
 @Injectable({
