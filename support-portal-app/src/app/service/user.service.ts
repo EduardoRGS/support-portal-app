@@ -4,6 +4,8 @@ import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 import { User } from '../model/user';
 import { JwtHelperService } from "@auth0/angular-jwt";
+import { stringify } from 'querystring';
+import { CustomHttpResponse } from '../model/custom-http-response';
 
 @Injectable({
   providedIn: 'root'
@@ -26,8 +28,8 @@ export class UserService {
     return this.http.put<User>(`${this.host}/user/update`, formData);
   }
   
-  public deleteUser(userId: number): Observable<any | HttpErrorResponse> {
-    return this.http.get(`${this.host}/user/de/delete${userId}`);
+  public deleteUser(userId: number): Observable<CustomHttpResponse | HttpErrorResponse> {
+    return this.http.delete<CustomHttpResponse>(`${this.host}/user/de/delete${userId}`);
   }
 
   public updateProfileImage(formData: FormData): Observable<HttpEvent<User> | HttpErrorResponse> {
@@ -37,8 +39,32 @@ export class UserService {
     });
   }
 
-  public resetPassword(email: string): Observable<any | HttpErrorResponse> {
-    return this.http.get(`${this.host}/user/resetpassword/${email}`);
+  public resetPassword(email: string): Observable<CustomHttpResponse | HttpErrorResponse> {
+    return this.http.get<CustomHttpResponse>(`${this.host}/user/resetpassword/${email}`);
+  }
+
+  public addUsersToLocalCache(users: User[]):void {
+    localStorage.setItem('users', JSON.stringify(users));
+  }
+
+  public getUsersToLocalCache(): User[] {
+     if (localStorage.getItem('users'))
+        return JSON.parse(localStorage.getItem('users') || '');
+    return [];
+  }
+
+  public createUserFromDate(loggedInUsername: string, user: User, profileImage: File): FormData {
+    const formData = new FormData();
+    formData.append('currentUsername', loggedInUsername);
+    formData.append('fistName', user.fistName);
+    formData.append('lastName', user.lastName);
+    formData.append('username', user.username);
+    formData.append('email', user.email);
+    formData.append('role', user.role);
+    formData.append('profileImage', profileImage);
+    formData.append('isActive', JSON.stringify(user.active));
+    formData.append('isNonLocked', JSON.stringify(user.notLocked));
+    return formData;
   }
   
 }
