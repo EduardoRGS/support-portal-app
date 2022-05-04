@@ -6,6 +6,7 @@ import { AuthenticationService } from './../service/authentication.service';
 import { Router } from '@angular/router';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { HeaderType } from '../enum/header-type.enum';
 
 @Component({
   selector: 'app-login',
@@ -31,18 +32,16 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   public onLogin(user: User){
     this.showLoading;
-    console.log(user);
     this.subscriptions.push(
       this.authenticationService.login(user).subscribe(
         (response: HttpResponse<User>) => {
-          const token = response.headers.get('Jwt-Token');
+          const token = response.headers.get(HeaderType.JWT_TOKEN);
           this.authenticationService.saveToken(token || '');
           this.authenticationService.addUserToLocalCache(response.body ? response.body : user);
           this.router.navigateByUrl('/user/management');
           this.showLoading = false;
         },
         (errorResponse: HttpErrorResponse) => {
-          console.log(errorResponse);
           this.sendErrorNotification(NotificationType.ERROR, errorResponse.error.message);
           this.showLoading = false;
         }
@@ -50,12 +49,10 @@ export class LoginComponent implements OnInit, OnDestroy {
     )
     
   }
-  sendErrorNotification(notificationType: NotificationType, message: any) {
-    if (message) {
-      this.notifier.showNotification(notificationType, message);
-    }else{
-      this.notifier.showNotification(notificationType, 'Erro Login, tente novamente!');
-    }
+  
+  sendErrorNotification(notificationType: NotificationType, message: any): void {
+    message ? this.notifier.showNotification(notificationType, message) : 
+    this.notifier.showNotification(notificationType, 'Usuário ou senha incorretos, tente novamente!')
   }
 
   ngOnDestroy(): void {
