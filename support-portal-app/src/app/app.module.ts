@@ -27,7 +27,8 @@ import { FormsModule } from '@angular/forms';
     AppRoutingModule,
     HttpClientModule,
     FormsModule,
-    NotificationModule
+    NotificationModule,
+    HttpClientModule
   ],
   providers: [AuthenticationService, UserService, AuthenticationGuard, NotificationService,
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}],

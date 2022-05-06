@@ -43,7 +43,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         },
         (errorResponse: HttpErrorResponse) => {
           this.sendErrorNotification(NotificationType.ERROR, errorResponse.error.message);
-          this.showLoading = false;
+          this.showLoading = true;
         }
       )
     )
