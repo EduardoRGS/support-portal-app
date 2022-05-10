@@ -15,7 +15,7 @@ import { HeaderType } from '../enum/header-type.enum';
 })
 export class LoginComponent implements OnInit, OnDestroy {
 
-  showLoading: boolean = true;
+  showLoading: boolean = false;
   private subscriptions: Subscription[] = [];
 
   constructor(private router: Router, 
@@ -43,7 +43,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         },
         (errorResponse: HttpErrorResponse) => {
           this.sendErrorNotification(NotificationType.ERROR, errorResponse.error.message);
-          this.showLoading = true;
+          this.showLoading = false;
         }
       )
     )
