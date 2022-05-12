@@ -31,7 +31,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   public onLogin(user: User){
-    this.showLoading;
+    this.showLoading = true;
     this.subscriptions.push(
       this.authenticationService.login(user).subscribe(
         (response: HttpResponse<User>) => {
