@@ -1,7 +1,7 @@
 export class User {
     public id: number;
     public userId: string;
-    public fistName: string;
+    public firstName: string;
     public lastName: string;
     public username: string;
     public password: string;
@@ -18,7 +18,7 @@ export class User {
     constructor(){
         this.id = 0;
         this.userId = '';
-        this.fistName = '';
+        this.firstName = '';
         this.lastName = '';
         this.username = '';
         this.password = '';
