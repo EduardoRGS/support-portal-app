@@ -54,7 +54,7 @@ export class UserService {
   public createUserFromDate(loggedInUsername: string, user: User, profileImage: File): FormData {
     const formData = new FormData();
     formData.append('currentUsername', loggedInUsername);
-    formData.append('fistName', user.fistName);
+    formData.append('fistName', user.firstName);
     formData.append('lastName', user.lastName);
     formData.append('username', user.username);
     formData.append('email', user.email);
