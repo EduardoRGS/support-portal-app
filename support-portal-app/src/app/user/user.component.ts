@@ -17,9 +17,15 @@ export class UserComponent implements OnInit {
   titleAction$ = this.titleSubject.asObservable();
   users: User[] = [];
   refreshing: boolean = false;
+  selectedUser: User = new User();
   private subscriptions: Subscription[] = [];
 
+  
   constructor(private userService: UserService, private notifier: NotificationService) { }
+  
+  ngOnInit(): void {
+    this.getUsers(true);
+  }
 
   changeTitle(title: string): void {
     this.titleSubject.next(title);
@@ -29,8 +35,7 @@ export class UserComponent implements OnInit {
     this.refreshing = true;
     this.subscriptions.push(
       this.userService.getUsers().subscribe(
-        (response) => {
-          response = [];;
+        (response: any) => {        
           this.userService.addUsersToLocalCache(response);
           this.users = response;
           this.refreshing = false;
@@ -45,12 +50,15 @@ export class UserComponent implements OnInit {
     );
   }
 
+  onSelectUser(selectedUser: User){
+    this.selectedUser = selectedUser;
+    document.getElementById('openUserInfo')?.click();
+  }
+
   sendNotification(notificationType: NotificationType, message: any): void {
     message ? this.notifier.showNotification(notificationType, message) : 
     this.notifier.showNotification(notificationType, 'Usuário ou senha incorretos, tente novamente!')
   }
 
-  ngOnInit(): void {
-  }
 
 }
