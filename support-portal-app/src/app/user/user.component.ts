@@ -50,9 +50,13 @@ export class UserComponent implements OnInit {
     );
   }
 
-  onSelectUser(selectedUser: User){
+  onSelectUser(selectedUser: User): void {
     this.selectedUser = selectedUser;
-    document.getElementById('openUserInfo')?.click();
+    this.clickButton('openUserInfo');
+  }
+
+  private clickButton(buttonId: string): void {
+    document.getElementById(buttonId)?.click();
   }
 
   sendNotification(notificationType: NotificationType, message: any): void {
