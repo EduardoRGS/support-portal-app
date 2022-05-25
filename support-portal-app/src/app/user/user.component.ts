@@ -5,6 +5,7 @@ import { Component, OnInit } from '@angular/core';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { User } from '../model/user';
 import { NotificationType } from '../enum/notification-type.enum';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-user',
@@ -14,11 +15,13 @@ import { NotificationType } from '../enum/notification-type.enum';
 export class UserComponent implements OnInit {
 
   private titleSubject = new BehaviorSubject<string>('Profile');
+  private subscriptions?: Subscription[];
   titleAction$ = this.titleSubject.asObservable();
-  users: User[] = [];
+  users?: User[];
   refreshing: boolean = false;
-  selectedUser: User = new User();
-  private subscriptions: Subscription[] = [];
+  selectedUser?: User;
+  fileName?: string;
+  profileImage: File = new File([""], "");
 
   
   constructor(private userService: UserService, private notifier: NotificationService) { }
@@ -33,7 +36,7 @@ export class UserComponent implements OnInit {
 
   getUsers(showNotification: boolean): void {
     this.refreshing = true;
-    this.subscriptions.push(
+    this.subscriptions?.push(
       this.userService.getUsers().subscribe(
         (response: any) => {        
           this.userService.addUsersToLocalCache(response);
@@ -57,6 +60,34 @@ export class UserComponent implements OnInit {
 
   private clickButton(buttonId: string): void {
     document.getElementById(buttonId)?.click();
+  }
+
+  onProfileImageChange(fileName: string, profileImage: File): void {
+    this.fileName = fileName;
+    this.profileImage = profileImage;
+  }
+
+  onAddNewUser(userForm: NgForm): void {
+    const formData = this.userService.createUserFromDate('', userForm.value, this.profileImage);
+    this.subscriptions?.push(
+      this.userService.addUser(formData).subscribe(
+        (response: any) => {
+          this.clickButton('new-user-save');
+          this.getUsers(false);
+          this.fileName = undefined;
+          this.profileImage;
+          userForm.reset();
+          this.sendNotification(NotificationType.SUCCESS, `${response.fistName} ${response.lastName} updated successfully`);
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.sendNotification(NotificationType.ERROR, errorResponse.error.message);
+        }
+      ));
+    
+  }
+
+  saveNewUser(): void {
+    this.clickButton('new-user-save');
   }
 
   sendNotification(notificationType: NotificationType, message: any): void {
