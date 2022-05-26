@@ -219,7 +219,7 @@
                     </div>
                     <div class="custom-file">
                     <input type="file" accept="image/*" name="profileImage"
-                    (change)="onProfileImageChange($event.target.files[0].name, $event.target.files[0])"
+                    (change)="onProfileImageChange($event, $event)"
                         class="custom-file-input">
                     <label class="custom-file-label"><span [hidden]="!fileName">{{ fileName }}</span>
                         <span [hidden]="fileName">Choose File</span>
