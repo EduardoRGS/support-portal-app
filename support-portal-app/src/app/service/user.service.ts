@@ -38,7 +38,7 @@ export class UserService {
   }
 
   public resetPassword(email: string): Observable<CustomHttpResponse | HttpErrorResponse> {
-    return this.http.get<CustomHttpResponse>(`${this.host}/user/resetpassword/${email}`);
+    return this.http.get<CustomHttpResponse>(`${this.host}/user/resetPassword/${email}`);
   }
 
   public addUsersToLocalCache(users: User[]):void {

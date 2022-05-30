@@ -152,6 +152,26 @@ export class UserComponent implements OnInit {
         }
       ));
   }
+
+  onResetPassword(email: NgForm): void{
+    const emailAddress = email.value['reset-password-email'];
+    this.refreshing = true;
+    console.log(emailAddress);
+    
+    this.subscriptions.push(
+      this.userService.resetPassword(emailAddress).subscribe(
+        (response: any) => {
+          this.sendNotification(NotificationType.SUCCESS, response.message);
+          this.refreshing = false;
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.sendNotification(NotificationType.WARNING, errorResponse.error.message);
+          this.refreshing = false;
+        },
+        () => email.reset()
+      )
+    )
+  }
   
   sendNotification(notificationType: NotificationType, message: any): void {
     message ? this.notifier.showNotification(notificationType, message) : 
@@ -163,7 +183,7 @@ export class UserComponent implements OnInit {
   }
   
   public get isAdmin(): boolean {
-    return this.getUserRole() === Role.ADMIN || this.getUserRole() === Role.SUPER_ADMIN;
+    return this.getUserRole() === Role.USER || this.getUserRole() === Role.SUPER_ADMIN;
   }
 
   public get isManager(): boolean {
