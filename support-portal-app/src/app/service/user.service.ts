@@ -27,7 +27,7 @@ export class UserService {
   }
   
   public deleteUser(userId: number): Observable<CustomHttpResponse | HttpErrorResponse> {
-    return this.http.delete<CustomHttpResponse>(`${this.host}/user/de/delete${userId}`);
+    return this.http.delete<CustomHttpResponse>(`${this.host}/user/delete/${userId}`);
   }
 
   public updateProfileImage(formData: FormData): Observable<HttpEvent<User> | HttpErrorResponse> {

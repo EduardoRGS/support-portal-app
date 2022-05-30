@@ -8,6 +8,7 @@ import { User } from '../model/user';
 import { NotificationType } from '../enum/notification-type.enum';
 import { NgForm } from '@angular/forms';
 import { Role } from '../enum/role.enum';
+import { CustomHttpResponse } from '../model/custom-http-response';
 
 @Component({
   selector: 'app-user',
@@ -114,11 +115,7 @@ export class UserComponent implements OnInit {
     }
   }
   
-  sendNotification(notificationType: NotificationType, message: any): void {
-    message ? this.notifier.showNotification(notificationType, message) : 
-    this.notifier.showNotification(notificationType, 'Usuário ou senha incorretos, tente novamente!')
-  }
-
+  
   onEditUser(editUser: User): void{
     this.editUser = editUser;
     this.currentUsername = editUser.username;
@@ -142,13 +139,31 @@ export class UserComponent implements OnInit {
         }
       ));
   }
-   
+
+  onDeleteUser(userId: number): void{
+    this.subscriptions.push(
+      this.userService.deleteUser(userId).subscribe(
+        (response: any) => {
+          this.getUsers(true);
+          this.sendNotification(NotificationType.SUCCESS, response.message);
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.sendNotification(NotificationType.ERROR, errorResponse.error.message);
+        }
+      ));
+  }
+  
+  sendNotification(notificationType: NotificationType, message: any): void {
+    message ? this.notifier.showNotification(notificationType, message) : 
+    this.notifier.showNotification(notificationType, 'Usuário ou senha incorretos, tente novamente!')
+  }
+
   private getUserRole(): string {
     return this.authenticationService.getUserFromLocalCache().role;
   }
-
+  
   public get isAdmin(): boolean {
-    return this.getUserRole() === Role.USER || this.getUserRole() === Role.SUPER_ADMIN;
+    return this.getUserRole() === Role.ADMIN || this.getUserRole() === Role.SUPER_ADMIN;
   }
 
   public get isManager(): boolean {
