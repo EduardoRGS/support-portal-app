@@ -18,12 +18,14 @@ export class UserComponent implements OnInit {
 
   private titleSubject = new BehaviorSubject<string>('Profile');
   private subscriptions: Subscription[] = [];
+  private currentUsername: string = "";
   titleAction$ = this.titleSubject.asObservable();
   users?: User[];
   refreshing: boolean = false;
   selectedUser?: User;
   fileName?: string;
   profileImage: any;
+  editUser = new User();
 
   
   constructor(private userService: UserService, private notifier: NotificationService,
@@ -83,7 +85,7 @@ export class UserComponent implements OnInit {
       this.userService.addUser(formData).subscribe(
         (response: any) => {
           this.getUsers(false);
-          this.sendNotification(NotificationType.SUCCESS, `${response.firstName} ${response.lastName} updated successfully`);
+          this.sendNotification(NotificationType.SUCCESS, `${response.firstName} ${response.lastName} register successfully`);
           userForm.onReset();
           this.profileImage = null;
           this.fileName = undefined;
@@ -111,7 +113,36 @@ export class UserComponent implements OnInit {
       this.users = this.userService.getUsersToLocalCache();
     }
   }
+  
+  sendNotification(notificationType: NotificationType, message: any): void {
+    message ? this.notifier.showNotification(notificationType, message) : 
+    this.notifier.showNotification(notificationType, 'Usuário ou senha incorretos, tente novamente!')
+  }
 
+  onEditUser(editUser: User): void{
+    this.editUser = editUser;
+    this.currentUsername = editUser.username;
+    this.clickButton('openUserEdit');
+  }
+
+  onUpdateUser(): void{
+    const formData = this.userService.createUserFromDate(this.currentUsername, this.editUser, this.profileImage);
+    this.subscriptions?.push(
+      this.userService.updateUser(formData).subscribe(
+        (response: any) => {
+          this.clickButton('closeEditUserModelButton');
+          this.getUsers(false);
+          this.sendNotification(NotificationType.SUCCESS, `${response.firstName} ${response.lastName} updated successfully`);
+          this.profileImage = null;
+          this.fileName = undefined;
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.sendNotification(NotificationType.ERROR, "Erro ao cadastrar um novo usuário no sisitema");
+          this.profileImage = null;
+        }
+      ));
+  }
+   
   private getUserRole(): string {
     return this.authenticationService.getUserFromLocalCache().role;
   }
@@ -129,10 +160,6 @@ export class UserComponent implements OnInit {
   }
 
 
-  sendNotification(notificationType: NotificationType, message: any): void {
-    message ? this.notifier.showNotification(notificationType, message) : 
-    this.notifier.showNotification(notificationType, 'Usuário ou senha incorretos, tente novamente!')
-  }
 
 
 }
