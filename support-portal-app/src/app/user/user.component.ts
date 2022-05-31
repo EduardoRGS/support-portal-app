@@ -22,6 +22,7 @@ export class UserComponent implements OnInit {
   private currentUsername: string = "";
   titleAction$ = this.titleSubject.asObservable();
   users?: User[];
+  user?: User;
   refreshing: boolean = false;
   selectedUser?: User;
   fileName?: string;
@@ -33,6 +34,7 @@ export class UserComponent implements OnInit {
               private authenticationService: AuthenticationService) { }
   
   ngOnInit(): void {
+    this.user = this.authenticationService.getUserFromLocalCache();
     this.getUsers(true);
   }
 
@@ -160,7 +162,7 @@ export class UserComponent implements OnInit {
     
     this.subscriptions.push(
       this.userService.resetPassword(emailAddress).subscribe(
-        (response: any) => {
+        (response: CustomHttpResponse) => {
           this.sendNotification(NotificationType.SUCCESS, response.message);
           this.refreshing = false;
         },

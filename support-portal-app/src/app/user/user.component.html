@@ -14,7 +14,7 @@
       <div class="nav nav-pills">
         <a
           class="nav-item nav-link active ml-1"
-          (click)="(null)"
+          (click)="changeTitle('Users')"
           data-toggle="tab"
           href="#users"
         >
@@ -23,7 +23,7 @@
         </a>
         <a
           class="nav-item nav-link ml-3"
-          (click)="(null)"
+          (click)="changeTitle('Settings')"
           data-toggle="tab"
           href="#reset-password"
         >
@@ -32,11 +32,11 @@
         </a>
         <a
           class="nav-item nav-link move-right mr-3"
-          (click)="(null)"
+          (click)="changeTitle('Profile')"
           data-toggle="tab"
           href="#profile"
         >
-          Welcome,
+          Welcome, {{user?.firstName}}
           <i class="fa fa-user"></i>
         </a>
       </div>
