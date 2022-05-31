@@ -14,23 +14,23 @@ export class UserService {
   
   constructor(private http: HttpClient) { }
 
-  public getUsers(): Observable<User[] | HttpErrorResponse> {
+  public getUsers(): Observable<User[]> {
     return this.http.get<User[]>(`${this.host}/user/all`);
   }
 
-  public addUser(formData: FormData): Observable<User | HttpErrorResponse> {
+  public addUser(formData: FormData): Observable<User> {
     return this.http.post<User>(`${this.host}/user/add`, formData);
   }
 
-  public updateUser(formData: FormData): Observable<User | HttpErrorResponse> {
+  public updateUser(formData: FormData): Observable<User> {
     return this.http.put<User>(`${this.host}/user/update`, formData);
   }
   
-  public deleteUser(userId: number): Observable<CustomHttpResponse | HttpErrorResponse> {
+  public deleteUser(userId: number): Observable<CustomHttpResponse> {
     return this.http.delete<CustomHttpResponse>(`${this.host}/user/delete/${userId}`);
   }
 
-  public updateProfileImage(formData: FormData): Observable<HttpEvent<User> | HttpErrorResponse> {
+  public updateProfileImage(formData: FormData): Observable<HttpEvent<User>> {
     return this.http.put<any>(`${this.host}/user/updateProfileImage`, formData,
     {reportProgress: true,
       observe: 'events'

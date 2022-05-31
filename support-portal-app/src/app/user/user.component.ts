@@ -1,5 +1,6 @@
+import { Router } from '@angular/router';
 import { AuthenticationService } from './../service/authentication.service';
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpEvent } from '@angular/common/http';
 import { NotificationService } from './../service/notification.service';
 import { UserService } from './../service/user.service';
 import { Component, OnInit } from '@angular/core';
@@ -22,7 +23,7 @@ export class UserComponent implements OnInit {
   private currentUsername: string = "";
   titleAction$ = this.titleSubject.asObservable();
   users?: User[];
-  user?: User;
+  user = new User();
   refreshing: boolean = false;
   selectedUser?: User;
   fileName?: string;
@@ -31,7 +32,7 @@ export class UserComponent implements OnInit {
 
   
   constructor(private userService: UserService, private notifier: NotificationService,
-              private authenticationService: AuthenticationService) { }
+              private authenticationService: AuthenticationService, private router: Router) { }
   
   ngOnInit(): void {
     this.user = this.authenticationService.getUserFromLocalCache();
@@ -158,8 +159,7 @@ export class UserComponent implements OnInit {
   onResetPassword(email: NgForm): void{
     const emailAddress = email.value['reset-password-email'];
     this.refreshing = true;
-    console.log(emailAddress);
-    
+
     this.subscriptions.push(
       this.userService.resetPassword(emailAddress).subscribe(
         (response: CustomHttpResponse) => {
@@ -174,7 +174,56 @@ export class UserComponent implements OnInit {
       )
     )
   }
+
+  onUpdateCurrentUser(user: User): void {
+    this.refreshing = true;
+    this.currentUsername = this.authenticationService.getUserFromLocalCache().username;
+    const formData = this.userService.createUserFromDate(this.currentUsername, user, this.profileImage);
+    this.subscriptions?.push(
+      this.userService.updateUser(formData).subscribe(
+        (response: any) => {
+          this.authenticationService.addUserToLocalCache(response);
+          this.clickButton('closeEditUserModelButton');
+          this.getUsers(false);
+          this.sendNotification(NotificationType.SUCCESS, `${response.firstName} ${response.lastName} updated successfully`);
+          this.profileImage = null;
+          this.fileName = undefined;
+          this.refreshing = false;
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.sendNotification(NotificationType.ERROR, "Erro ao cadastrar um novo usuário no sisitema");
+          this.profileImage = null;
+          this.refreshing = false;
+        }
+      ));
+  }
+
+  onLogOut(): void {
+    this.authenticationService.logOut();
+    this.router.navigate(['/login']);
+    this.sendNotification(NotificationType.SUCCESS, "Deslogado com sucesso");
+  }
   
+  updateProfileImage(): void{
+    this.clickButton('profile-image-input');
+  }
+
+  ondateProfileImage(): void{
+    const formData = new FormData();
+    formData.append('username', this.user?.username);
+    formData.append('profileImage', this.profileImage);
+    this.subscriptions?.push(
+      this.userService.updateProfileImage(formData).subscribe(
+        (event: HttpEvent<any>) => {
+          this.sendNotification(NotificationType.SUCCESS, `profile image updated successfully`);
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.sendNotification(NotificationType.ERROR, errorResponse.error.message);
+        }
+      ));
+  }
+  
+
   sendNotification(notificationType: NotificationType, message: any): void {
     message ? this.notifier.showNotification(notificationType, message) : 
     this.notifier.showNotification(notificationType, 'Usuário ou senha incorretos, tente novamente!')
