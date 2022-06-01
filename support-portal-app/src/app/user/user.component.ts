@@ -1,6 +1,7 @@
+import { FileUploadStatus } from './../model/file-upload-status';
 import { Router } from '@angular/router';
 import { AuthenticationService } from './../service/authentication.service';
-import { HttpErrorResponse, HttpEvent } from '@angular/common/http';
+import { HttpErrorResponse, HttpEvent, HttpEventType } from '@angular/common/http';
 import { NotificationService } from './../service/notification.service';
 import { UserService } from './../service/user.service';
 import { Component, OnInit } from '@angular/core';
@@ -29,6 +30,7 @@ export class UserComponent implements OnInit {
   fileName?: string;
   profileImage: any;
   editUser = new User();
+  fileStatus = new FileUploadStatus();
 
   
   constructor(private userService: UserService, private notifier: NotificationService,
@@ -208,17 +210,18 @@ export class UserComponent implements OnInit {
     this.clickButton('profile-image-input');
   }
 
-  ondateProfileImage(): void{
+  onUpdateProfileImage(): void{
     const formData = new FormData();
     formData.append('username', this.user?.username);
     formData.append('profileImage', this.profileImage);
     this.subscriptions?.push(
       this.userService.updateProfileImage(formData).subscribe(
         (event: HttpEvent<any>) => {
-          this.sendNotification(NotificationType.SUCCESS, `profile image updated successfully`);
+          this.reportUploadProgress(event);
         },
         (errorResponse: HttpErrorResponse) => {
           this.sendNotification(NotificationType.ERROR, errorResponse.error.message);
+          this.fileStatus.status = 'done';
         }
       ));
   }
@@ -229,12 +232,36 @@ export class UserComponent implements OnInit {
     this.notifier.showNotification(notificationType, 'Usuário ou senha incorretos, tente novamente!')
   }
 
+  private reportUploadProgress(event: HttpEvent<any>): void {
+    switch(event.type) {
+      case HttpEventType.UploadProgress:
+        event.total = 0;
+        this.fileStatus.percentage = Math.round(100 * event.loaded / event.total);
+        this.fileStatus.status = 'progress';
+        break;
+      case HttpEventType.Response:
+        if(event.status === 200){
+          this.user.profileImageUrl = `${event.body.profileImageUrl}?time=${new Date().getTime()} `;
+          this.sendNotification(NotificationType.SUCCESS, `${event.body.firstName}\´s profile image update successfull`);
+          this.fileStatus.status = 'done';
+          break;
+        }else{
+          this.sendNotification(NotificationType.SUCCESS, `Unable to upload image. Please try again.`);
+          break;
+        }
+
+      default:
+        'Finished all processes';
+      
+    }
+  }
+
   private getUserRole(): string {
     return this.authenticationService.getUserFromLocalCache().role;
   }
   
   public get isAdmin(): boolean {
-    return this.getUserRole() === Role.USER || this.getUserRole() === Role.SUPER_ADMIN;
+    return this.getUserRole() === Role.ADMIN || this.getUserRole() === Role.SUPER_ADMIN;
   }
 
   public get isManager(): boolean {
