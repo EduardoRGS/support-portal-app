@@ -28,6 +28,12 @@
                 </div>
                 <input type="text" class="form-control" name="username" placeholder="Username" required ngModel #usernameInput="ngModel">
               </div>
+              <div class="input-group mb-3">
+                <div class="input-group-append">
+                  <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                </div>
+                <input type="password" class="form-control" name="password" placeholder="Password" required ngModel #usernameInput="ngModel">
+              </div>
               <span class="help-block" *ngIf="usernameInput.invalid && usernameInput.touched" style="color:red;">Please enter a username</span>
               <div class="input-group mb-2">
                 <div class="input-group-append">
